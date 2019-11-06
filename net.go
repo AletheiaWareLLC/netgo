@@ -40,15 +40,17 @@ func HTTPSRedirect(paths map[string]bool) func(http.ResponseWriter, *http.Reques
 	}
 }
 
-func StaticHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path)
-	switch r.Method {
-	case "HEAD":
-		fallthrough
-	case "GET":
-		http.ServeFile(w, r, path.Join("html/static", r.URL.Path))
-	default:
-		log.Println("Unsupported method", r.Method)
+func StaticHandler(directory string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path)
+		switch r.Method {
+		case "HEAD":
+			fallthrough
+		case "GET":
+			http.ServeFile(w, r, path.Join(directory, r.URL.Path))
+		default:
+			log.Println("Unsupported method", r.Method)
+		}
 	}
 }
 

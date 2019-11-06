@@ -84,7 +84,7 @@ func start() error {
 
 	// Serve Web Requests
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", netgo.StaticHandler)
+	mux.HandleFunc("/", netgo.StaticHandler("html/static"))
 	// Serve HTTPS Requests
 	config := &tls.Config{MinVersion: tls.VersionTLS10}
 	server := &http.Server{Addr: ":443", Handler: mux, TLSConfig: config}
