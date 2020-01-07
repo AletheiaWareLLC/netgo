@@ -55,7 +55,7 @@ func start() error {
 	if err := os.MkdirAll(store, os.ModePerm); err != nil {
 		return err
 	}
-	logFile, err := os.OpenFile(path.Join(store, time.Now().Format(time.RFC3339)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
+	logFile, err := os.OpenFile(path.Join(store, time.Now().UTC().Format(time.RFC3339)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
 		return err
 	}
