@@ -31,10 +31,10 @@ func HTTPSRedirect(paths map[string]bool) func(http.ResponseWriter, *http.Reques
 			if len(r.URL.RawQuery) > 0 {
 				target += "?" + r.URL.RawQuery
 			}
-			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, "redirected to", target)
+			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header, "redirected to", target)
 			http.Redirect(w, r, target, http.StatusTemporaryRedirect)
 		} else {
-			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, "not found")
+			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header, "not found")
 			http.NotFound(w, r)
 		}
 	}
@@ -42,7 +42,7 @@ func HTTPSRedirect(paths map[string]bool) func(http.ResponseWriter, *http.Reques
 
 func StaticHandler(directory string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path)
+		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header)
 		switch r.Method {
 		case "HEAD":
 			fallthrough
