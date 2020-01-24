@@ -23,10 +23,10 @@ import (
 	"path"
 )
 
-func HTTPSRedirect(paths map[string]bool) func(http.ResponseWriter, *http.Request) {
+func HTTPSRedirect(host string, paths map[string]bool) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		allowed, ok := paths[r.URL.Path]
-		if allowed && ok {
+		if allowed && ok && r.Host == host {
 			target := "https://" + r.Host + r.URL.Path
 			if len(r.URL.RawQuery) > 0 {
 				target += "?" + r.URL.RawQuery

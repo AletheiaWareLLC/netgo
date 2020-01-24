@@ -29,7 +29,7 @@ func TestHTTPSRedirect(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/foo/bar", nil)
 		response := httptest.NewRecorder()
 
-		netgo.HTTPSRedirect(map[string]bool{
+		netgo.HTTPSRedirect("", map[string]bool{
 			"/foo/bar": true,
 		})(response, request)
 
@@ -48,7 +48,7 @@ func TestHTTPSRedirect(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/foo/bar", nil)
 		response := httptest.NewRecorder()
 
-		netgo.HTTPSRedirect(map[string]bool{})(response, request)
+		netgo.HTTPSRedirect("", map[string]bool{})(response, request)
 
 		if response.Code != http.StatusNotFound {
 			t.Errorf("Wrong response code; expected 404, got '%s'", http.StatusText(response.Code))

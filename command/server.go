@@ -70,6 +70,8 @@ func start() error {
 	}
 	log.Println("Certificate Directory:", certificates)
 
+	host := os.LookupEnv("HOST")
+
 	routeMap := make(map[string]bool)
 
 	routes, ok := os.LookupEnv("ROUTES")
@@ -80,7 +82,7 @@ func start() error {
 	}
 
 	// Redirect HTTP Requests to HTTPS
-	go http.ListenAndServe(":80", http.HandlerFunc(netgo.HTTPSRedirect(routeMap)))
+	go http.ListenAndServe(":80", http.HandlerFunc(netgo.HTTPSRedirect(host, routeMap)))
 
 	// Serve Web Requests
 	mux := http.NewServeMux()
