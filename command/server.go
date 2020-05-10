@@ -18,6 +18,7 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/AletheiaWareLLC/netgo"
 	"io"
@@ -70,7 +71,10 @@ func start() error {
 	}
 	log.Println("Certificate Directory:", certificates)
 
-	host := os.LookupEnv("HOST")
+	host, ok := os.LookupEnv("HOST")
+	if !ok {
+		return errors.New("Missing HOST environment variable")
+	}
 
 	routeMap := make(map[string]bool)
 
