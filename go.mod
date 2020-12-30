@@ -1,3 +1,3 @@
-module github.com/AletheiaWareLLC/netgo
+module aletheiaware.com/netgo
 
 go 1.14

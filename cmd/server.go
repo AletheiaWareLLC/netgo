@@ -17,10 +17,10 @@
 package main
 
 import (
+	"aletheiaware.com/netgo"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/AletheiaWareLLC/netgo"
 	"io"
 	"log"
 	"net/http"

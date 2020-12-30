@@ -17,7 +17,7 @@
 package netgo_test
 
 import (
-	"github.com/AletheiaWareLLC/netgo"
+	"aletheiaware.com/netgo"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
