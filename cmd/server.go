@@ -65,36 +65,42 @@ func start() error {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("Log File:", logFile.Name())
 
-	certificates, ok := os.LookupEnv("CERTIFICATE_DIRECTORY")
-	if !ok {
-		certificates = "certificates"
-	}
-	log.Println("Certificate Directory:", certificates)
-
-	host, ok := os.LookupEnv("HOST")
-	if !ok {
-		return errors.New("Missing HOST environment variable")
-	}
-
-	routeMap := make(map[string]bool)
-
-	routes, ok := os.LookupEnv("ROUTES")
-	if ok {
-		for _, route := range strings.Split(routes, ",") {
-			routeMap[route] = true
-		}
-	}
-
-	// Redirect HTTP Requests to HTTPS
-	go http.ListenAndServe(":80", http.HandlerFunc(netgo.HTTPSRedirect(host, routeMap)))
-
 	// Serve Web Requests
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", netgo.StaticHandler("html/static"))
-	// Serve HTTPS Requests
-	config := &tls.Config{MinVersion: tls.VersionTLS10}
-	server := &http.Server{Addr: ":443", Handler: mux, TLSConfig: config}
-	return server.ListenAndServeTLS(path.Join(certificates, "fullchain.pem"), path.Join(certificates, "privkey.pem"))
+
+	if https, ok := os.LookupEnv(netgo.HTTPS); ok && https == "true" {
+		certificates, ok := os.LookupEnv("CERTIFICATE_DIRECTORY")
+		if !ok {
+			certificates = "certificates"
+		}
+		log.Println("Certificate Directory:", certificates)
+
+		host, ok := os.LookupEnv("HOST")
+		if !ok {
+			return errors.New("Missing HOST environment variable")
+		}
+
+		routeMap := make(map[string]bool)
+
+		routes, ok := os.LookupEnv("ROUTES")
+		if ok {
+			for _, route := range strings.Split(routes, ",") {
+				routeMap[route] = true
+			}
+		}
+
+		// Redirect HTTP Requests to HTTPS
+		go http.ListenAndServe(":80", http.HandlerFunc(netgo.HTTPSRedirect(host, routeMap)))
+
+		// Serve HTTPS Requests
+		config := &tls.Config{MinVersion: tls.VersionTLS10}
+		server := &http.Server{Addr: ":443", Handler: mux, TLSConfig: config}
+		return server.ListenAndServeTLS(path.Join(certificates, "fullchain.pem"), path.Join(certificates, "privkey.pem"))
+	} else {
+		log.Println("HTTP Server Listening on :80")
+		return http.ListenAndServe(":80", mux)
+	}
 }
 
 func PrintUsage(output io.Writer) {

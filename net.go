@@ -23,6 +23,8 @@ import (
 	"path"
 )
 
+const HTTPS = "HTTPS"
+
 func HTTPSRedirect(host string, paths map[string]bool) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		allowed, ok := paths[r.URL.Path]
