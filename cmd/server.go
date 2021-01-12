@@ -65,9 +65,14 @@ func start() error {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("Log File:", logFile.Name())
 
+	content, ok := os.LookupEnv("CONTENT_DIRECTORY")
+	if !ok {
+		content = "html/static"
+	}
+
 	// Serve Web Requests
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", netgo.StaticHandler("html/static"))
+	mux.HandleFunc("/", netgo.StaticHandler(content))
 
 	if https, ok := os.LookupEnv(netgo.HTTPS); ok && https == "true" {
 		certificates, ok := os.LookupEnv("CERTIFICATE_DIRECTORY")
