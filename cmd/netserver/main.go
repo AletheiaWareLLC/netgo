@@ -110,6 +110,6 @@ func start() error {
 
 func PrintUsage(output io.Writer) {
 	fmt.Fprintln(output, "Net Server Usage:")
-	fmt.Fprintln(output, "\tserver - display usage")
-	fmt.Fprintln(output, "\tserver start - starts the server")
+	fmt.Fprintln(output, "\tnetserver - display usage")
+	fmt.Fprintln(output, "\tnetserver start - starts the server")
 }

@@ -11,7 +11,7 @@ This is a Go implementation of a static website server.
 
 ```
 # Install the binary (or download from https://github.com/AletheiaWareLLC/netgo/releases/latest)
-go install aletheiaware.com/netgo/cmd/server
+go install aletheiaware.com/netgo/cmd/netserver
 
 # Create user
 adduser netgo
@@ -36,7 +36,7 @@ Description=netgo static website server
 User=netgo
 WorkingDirectory=/home/netgo
 EnvironmentFile=/home/netgo/config
-ExecStart=$(whereis server) start
+ExecStart=$(whereis netserver) start
 SuccessExitStatus=143
 TimeoutStopSec=10
 Restart=on-failure
@@ -57,7 +57,7 @@ sudo systemctl start netgo
 
 # Content
 
-By default `netgo` will serve content from a subdirectory called `html\static`, this can be overriden with the environment variable `CONTENT_DIRECTORY`.
+By default `netserver` will serve content from a subdirectory called `html\static`, this can be overriden with the environment variable `CONTENT_DIRECTORY`.
 
 ## Git Bare
 
@@ -94,7 +94,7 @@ Whenever you make changes to the website, commit them and run `git push live` to
 
 # Logging
 
-By default `netgo` will log to a subdirectory called `logs`, this can be overridden with the environment variable `LOG_DIRECTORY`.
+By default `netserver` will log to a subdirectory called `logs`, this can be overridden with the environment variable `LOG_DIRECTORY`.
 
 # HTTPS
 
@@ -139,12 +139,12 @@ sudo ufw enable
 
 # Allow netgo to bind to port 443 (HTTPS)
 # This is required each time the server binary is updated
-sudo setcap CAP_NET_BIND_SERVICE=+eip $(whereis netgo)
+sudo setcap CAP_NET_BIND_SERVICE=+eip $(whereis netserver)
 ```
 
 ## HTTP to HTTPS Redirect
 
-`netgo` can redirect clients accessing webpages via HTTP to use HTTPS instead when the following environment variables are set;
+`netserver` can redirect clients accessing webpages via HTTP to use HTTPS instead when the following environment variables are set;
 
 - `HOST` - only requests matching the given host will be redirected; eg `example.com`
 - `ROUTES` - only requests matching one of the given comma-separated routes will be redirected; eg `/,/index.html,/logo.png`
