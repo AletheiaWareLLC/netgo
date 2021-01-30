@@ -11,7 +11,7 @@ This is a Go implementation of a static website server.
 
 ```
 # Install the binary (or download from https://github.com/AletheiaWareLLC/netgo/releases/latest)
-go install aletheiaware.com/netgo
+go install aletheiaware.com/netgo/cmd/server
 
 # Create user
 adduser netgo
@@ -36,7 +36,7 @@ Description=netgo static website server
 User=netgo
 WorkingDirectory=/home/netgo
 EnvironmentFile=/home/netgo/config
-ExecStart=$(whereis netgo) start
+ExecStart=$(whereis server) start
 SuccessExitStatus=143
 TimeoutStopSec=10
 Restart=on-failure
