@@ -69,13 +69,13 @@ func TestStaticHandler(t *testing.T) {
 
 func assertQueryParameter(t *testing.T, query url.Values, key, expected string) {
 	t.Helper()
-	result := netgo.GetQueryParameter(query, "foo")
+	result := netgo.QueryParameter(query, "foo")
 	if result != expected {
 		t.Fatalf("Incorrect query parameter; expected '%s', got '%s'", expected, result)
 	}
 }
 
-func TestGetQueryParameter(t *testing.T) {
+func TestQueryParameter(t *testing.T) {
 	t.Run("0", func(t *testing.T) {
 		query := make(url.Values)
 		expected := ""

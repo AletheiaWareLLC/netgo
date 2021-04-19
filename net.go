@@ -56,7 +56,7 @@ func StaticHandler(directory string) func(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func GetQueryParameter(query url.Values, parameter string) string {
+func QueryParameter(query url.Values, parameter string) string {
 	if results, ok := query[parameter]; ok && len(results) > 0 {
 		return results[0]
 	}
