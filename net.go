@@ -42,6 +42,13 @@ func HTTPSRedirect(host string, paths map[string]bool) func(http.ResponseWriter,
 	}
 }
 
+func LoggingHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header)
+		h.ServeHTTP(w, r)
+	})
+}
+
 func StaticHandler(directory string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header)
