@@ -63,10 +63,6 @@ func TestHTTPSRedirect(t *testing.T) {
 	})
 }
 
-func TestStaticHandler(t *testing.T) {
-	// TODO
-}
-
 func assertQueryParameter(t *testing.T, query url.Values, key, expected string) {
 	t.Helper()
 	result := netgo.QueryParameter(query, "foo")

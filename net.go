@@ -20,7 +20,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"path"
 )
 
 const HTTPS = "HTTPS"
@@ -42,30 +41,10 @@ func HTTPSRedirect(host string, paths map[string]bool) func(http.ResponseWriter,
 	}
 }
 
-func LoggingHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header)
-		h.ServeHTTP(w, r)
-	})
-}
-
-func StaticHandler(directory string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header)
-		switch r.Method {
-		case "HEAD":
-			fallthrough
-		case "GET":
-			http.ServeFile(w, r, path.Join(directory, r.URL.Path))
-		default:
-			log.Println("Unsupported method", r.Method)
-		}
-	}
-}
-
 func QueryParameter(query url.Values, parameter string) string {
 	if results, ok := query[parameter]; ok && len(results) > 0 {
 		return results[0]
 	}
 	return ""
 }
+
