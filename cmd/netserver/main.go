@@ -18,6 +18,7 @@ package main
 
 import (
 	"aletheiaware.com/netgo"
+	"aletheiaware.com/netgo/handler"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -72,7 +73,7 @@ func start() error {
 
 	// Serve Web Requests
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", netgo.StaticHandler(content))
+	mux.Handle("/", handler.Log(handler.StaticDir(content)))
 
 	if https, ok := os.LookupEnv(netgo.HTTPS); ok && https == "true" {
 		certificates, ok := os.LookupEnv("CERTIFICATE_DIRECTORY")

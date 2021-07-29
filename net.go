@@ -47,4 +47,3 @@ func QueryParameter(query url.Values, parameter string) string {
 	}
 	return ""
 }
-
