@@ -2,7 +2,6 @@ package handler
 
 import (
 	"io/fs"
-	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -38,14 +37,12 @@ func (s *staticFS) Open(path string) (http.File, error) {
 		return nil, err
 	}
 	if !s.listable {
-		log.Println("Not Listable")
 		// Check if path is a directory
 		stat, err := file.Stat()
 		if err != nil {
 			return nil, err
 		}
 		if stat.IsDir() {
-			log.Println("Is Directory")
 			// Check if index.html exists
 			index, err := s.fs.Open(filepath.Join(path, "index.html"))
 			if err != nil {
@@ -55,7 +52,6 @@ func (s *staticFS) Open(path string) (http.File, error) {
 				}
 				return nil, err
 			}
-			log.Println("index.html exists")
 			// Close index
 			if err := index.Close(); err != nil {
 				return nil, err
