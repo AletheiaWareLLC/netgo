@@ -4,26 +4,64 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-	"path"
+	"path/filepath"
 )
 
-func AttachStaticDirHandler(m *http.ServeMux, directory string) {
-	m.Handle("/static/", Log(http.StripPrefix("/static/", StaticDir("html/static"))))
+func AttachStaticDirHandler(m *http.ServeMux, directory string, listable bool) {
+	AttachStaticHTTPFSHandler(m, http.Dir(directory), listable)
 }
 
-func AttachStaticFSHandler(m *http.ServeMux, fs fs.FS) {
-	m.Handle("/static/", Log(http.StripPrefix("/static/", http.FileServer(http.FS(fs)))))
+func AttachStaticFSHandler(m *http.ServeMux, fs fs.FS, listable bool) {
+	AttachStaticHTTPFSHandler(m, http.FS(fs), listable)
 }
 
-func StaticDir(directory string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case "HEAD":
-			fallthrough
-		case "GET":
-			http.ServeFile(w, r, path.Join(directory, r.URL.Path))
-		default:
-			log.Println("Unsupported method", r.Method)
+func AttachStaticHTTPFSHandler(m *http.ServeMux, fs http.FileSystem, listable bool) {
+	m.Handle("/static/", Log(http.StripPrefix("/static/", StaticFS(fs, listable))))
+}
+
+func StaticDir(directory string, listable bool) http.Handler {
+	return StaticFS(http.Dir(directory), listable)
+}
+
+func StaticFS(filesystem http.FileSystem, listable bool) http.Handler {
+	return http.FileServer(&staticFS{filesystem, listable})
+}
+
+type staticFS struct {
+	fs       http.FileSystem
+	listable bool
+}
+
+func (s *staticFS) Open(path string) (http.File, error) {
+	file, err := s.fs.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	if !s.listable {
+		log.Println("Not Listable")
+		// Check if path is a directory
+		stat, err := file.Stat()
+		if err != nil {
+			return nil, err
 		}
-	})
+		if stat.IsDir() {
+			log.Println("Is Directory")
+			// Check if index.html exists
+			index, err := s.fs.Open(filepath.Join(path, "index.html"))
+			if err != nil {
+				// Close directory
+				if err := file.Close(); err != nil {
+					return nil, err
+				}
+				return nil, err
+			}
+			log.Println("index.html exists")
+			// Close index
+			if err := index.Close(); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return file, nil
 }

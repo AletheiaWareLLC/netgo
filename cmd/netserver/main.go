@@ -73,7 +73,7 @@ func start() error {
 
 	// Serve Web Requests
 	mux := http.NewServeMux()
-	mux.Handle("/", handler.Log(handler.StaticDir(content)))
+	mux.Handle("/", handler.Log(handler.StaticDir(content, true)))
 
 	if https, ok := os.LookupEnv(netgo.HTTPS); ok && https == "true" {
 		certificates, ok := os.LookupEnv("CERTIFICATE_DIRECTORY")
