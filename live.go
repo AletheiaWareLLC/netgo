@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Aletheia Ware LLC
+ * Copyright 2021 Aletheia Ware LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,8 @@
 
 package netgo
 
-import (
-	"net/url"
-	"os"
-	"strconv"
-)
+const LIVE = "LIVE"
 
-func BooleanFlag(name string) bool {
-	flag, ok := os.LookupEnv(name)
-	if !ok {
-		return false
-	}
-	b, err := strconv.ParseBool(flag)
-	if err != nil {
-		return false
-	}
-	return b
-}
-
-func QueryParameter(query url.Values, parameter string) string {
-	if results, ok := query[parameter]; ok && len(results) > 0 {
-		return results[0]
-	}
-	return ""
+func IsLive() bool {
+	return BooleanFlag(LIVE)
 }
