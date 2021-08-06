@@ -100,7 +100,7 @@ func start() error {
 		go http.ListenAndServe(":80", http.HandlerFunc(netgo.HTTPSRedirect(host, routeMap)))
 
 		// Serve HTTPS Requests
-		config := &tls.Config{MinVersion: tls.VersionTLS10}
+		config := &tls.Config{MinVersion: tls.VersionTLS12}
 		server := &http.Server{Addr: ":443", Handler: mux, TLSConfig: config}
 		return server.ListenAndServeTLS(path.Join(certificates, "fullchain.pem"), path.Join(certificates, "privkey.pem"))
 	} else {
