@@ -35,10 +35,10 @@ func HTTPSRedirect(host string, paths map[string]bool) func(http.ResponseWriter,
 			if len(r.URL.RawQuery) > 0 {
 				target += "?" + r.URL.RawQuery
 			}
-			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header, "redirected to", target)
+			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL, r.Header, "redirected to", target)
 			http.Redirect(w, r, target, http.StatusTemporaryRedirect)
 		} else {
-			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL.Path, r.Header, "not found")
+			log.Println(r.RemoteAddr, r.Proto, r.Method, r.Host, r.URL, r.Header, "not found")
 			http.NotFound(w, r)
 		}
 	}
