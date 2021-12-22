@@ -6,16 +6,16 @@ import (
 	"path/filepath"
 )
 
-func AttachStaticDirHandler(m *http.ServeMux, directory string, listable bool) {
-	AttachStaticHTTPFSHandler(m, http.Dir(directory), listable)
+func AttachStaticDirHandler(m *http.ServeMux, directory string, listable bool, cache string) {
+	AttachStaticHTTPFSHandler(m, http.Dir(directory), listable, cache)
 }
 
-func AttachStaticFSHandler(m *http.ServeMux, fs fs.FS, listable bool) {
-	AttachStaticHTTPFSHandler(m, http.FS(fs), listable)
+func AttachStaticFSHandler(m *http.ServeMux, fs fs.FS, listable bool, cache string) {
+	AttachStaticHTTPFSHandler(m, http.FS(fs), listable, cache)
 }
 
-func AttachStaticHTTPFSHandler(m *http.ServeMux, fs http.FileSystem, listable bool) {
-	m.Handle("/static/", Log(http.StripPrefix("/static/", StaticFS(fs, listable))))
+func AttachStaticHTTPFSHandler(m *http.ServeMux, fs http.FileSystem, listable bool, cache string) {
+	m.Handle("/static/", Log(CacheControl(http.StripPrefix("/static/", StaticFS(fs, listable)), cache)))
 }
 
 func StaticDir(directory string, listable bool) http.Handler {

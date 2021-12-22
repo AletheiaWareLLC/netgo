@@ -10,6 +10,8 @@ import (
 	"testing/fstest"
 )
 
+const CC = "max-age=60"
+
 func TestStatic_File(t *testing.T) {
 	mux := http.NewServeMux()
 	fs := fstest.MapFS{
@@ -17,7 +19,7 @@ func TestStatic_File(t *testing.T) {
 			Data: []byte("hello, world"),
 		},
 	}
-	handler.AttachStaticFSHandler(mux, fs, false)
+	handler.AttachStaticFSHandler(mux, fs, false, CC)
 	t.Run("Returns 200 When File Exists", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/static/exists", nil)
 		response := httptest.NewRecorder()
@@ -44,7 +46,7 @@ func TestStatic_Directory(t *testing.T) {
 	t.Run("Returns 301 When Missing Trailing Slash", func(t *testing.T) {
 		mux := http.NewServeMux()
 		fs := fstest.MapFS{}
-		handler.AttachStaticFSHandler(mux, fs, true)
+		handler.AttachStaticFSHandler(mux, fs, true, CC)
 		request := httptest.NewRequest(http.MethodGet, "/static", nil)
 		response := httptest.NewRecorder()
 		mux.ServeHTTP(response, request)
@@ -61,7 +63,7 @@ func TestStatic_Directory(t *testing.T) {
 				Data: []byte("hello, world"),
 			},
 		}
-		handler.AttachStaticFSHandler(mux, fs, true)
+		handler.AttachStaticFSHandler(mux, fs, true, CC)
 		request := httptest.NewRequest(http.MethodGet, "/static/", nil)
 		response := httptest.NewRecorder()
 		mux.ServeHTTP(response, request)
@@ -78,7 +80,7 @@ func TestStatic_Directory(t *testing.T) {
 				Data: []byte("hello, world"),
 			},
 		}
-		handler.AttachStaticFSHandler(mux, fs, false)
+		handler.AttachStaticFSHandler(mux, fs, false, CC)
 		request := httptest.NewRequest(http.MethodGet, "/static/", nil)
 		response := httptest.NewRecorder()
 		mux.ServeHTTP(response, request)
@@ -95,7 +97,7 @@ func TestStatic_Directory(t *testing.T) {
 				Data: []byte("hello, world"),
 			},
 		}
-		handler.AttachStaticFSHandler(mux, fs, false)
+		handler.AttachStaticFSHandler(mux, fs, false, CC)
 		request := httptest.NewRequest(http.MethodGet, "/static/", nil)
 		response := httptest.NewRecorder()
 		mux.ServeHTTP(response, request)
