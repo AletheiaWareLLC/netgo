@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package netgo
+package main
 
-import (
-	"log"
-	"strconv"
-	"strings"
-)
+import "log"
 
-func ParseInt(s string) int64 {
-	s = strings.TrimSpace(s)
-	if s != "" {
-		if i, err := strconv.ParseInt(s, 10, 64); err != nil {
-			log.Println(err)
-		} else {
-			return int64(i)
-		}
+func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	if err := Serve(); err != nil {
+		log.Fatal(err)
 	}
-	return 0
 }

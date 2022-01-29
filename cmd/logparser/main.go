@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-package netgo
+package main
 
 import (
 	"log"
-	"strconv"
-	"strings"
+	"os"
 )
 
-func ParseInt(s string) int64 {
-	s = strings.TrimSpace(s)
-	if s != "" {
-		if i, err := strconv.ParseInt(s, 10, 64); err != nil {
-			log.Println(err)
-		} else {
-			return int64(i)
-		}
+func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	logs := os.Args[1:]
+	if len(logs) == 0 {
+		logs = append(logs, "logs")
 	}
-	return 0
+
+	os.Remove("log.db")
+
+	count, err := Parse("log.db", []string{
+		"log.go:",
+		"net.go:39:",
+		"net.go:44:",
+		"net.go:47:",
+	}, logs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Parsed", count, "Records")
 }

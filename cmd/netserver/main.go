@@ -26,14 +26,11 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
-	"time"
 )
 
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "start":
@@ -50,20 +47,11 @@ func main() {
 }
 
 func start() error {
-	store, ok := os.LookupEnv("LOG_DIRECTORY")
-	if !ok {
-		store = "logs"
-	}
-	if err := os.MkdirAll(store, os.ModePerm); err != nil {
-		return err
-	}
-	logFile, err := os.OpenFile(path.Join(store, time.Now().UTC().Format(time.RFC3339)), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0600)
+	logFile, err := netgo.SetupLogging()
 	if err != nil {
 		return err
 	}
 	defer logFile.Close()
-	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Println("Log File:", logFile.Name())
 
 	content, ok := os.LookupEnv("CONTENT_DIRECTORY")
@@ -102,7 +90,7 @@ func start() error {
 		// Serve HTTPS Requests
 		config := &tls.Config{MinVersion: tls.VersionTLS12}
 		server := &http.Server{Addr: ":443", Handler: mux, TLSConfig: config}
-		return server.ListenAndServeTLS(path.Join(certificates, "fullchain.pem"), path.Join(certificates, "privkey.pem"))
+		return server.ListenAndServeTLS(filepath.Join(certificates, "fullchain.pem"), filepath.Join(certificates, "privkey.pem"))
 	} else {
 		log.Println("HTTP Server Listening on :80")
 		return http.ListenAndServe(":80", mux)

@@ -1,0 +1,122 @@
+a.danger {
+    color: red;
+}
+body {
+    background-color: white;
+}
+table {
+    width: 100%;
+}
+#filters th {
+    text-align: right;
+    width: 50%;
+}
+#filters td {
+    text-align: left;
+    width: 50%;
+}
+td {
+    vertical-align: top;
+}
+svg text {
+    font-size: 16px;
+}
+.tab {
+    overflow: hidden;
+    background-color: #f1f1f1;
+    border: none;
+}
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+.tab button:hover {
+    background-color: #ddd;
+}
+.tab button.active {
+    background-color: #ccc;
+}
+.tabcontent {
+    display: none;
+    border: none;
+}
+#address-input, #protocol-input, #method-input, #url-input, #cookie-input, #referrer-input, #useragent-input {
+    width: calc(100% - 8px);
+}
+/*
+Color Palette from Practical Rules for Using Color in Charts by Stephen Few
+https://nbisweden.github.io/Rcourse/files/rules_for_using_color.pdf
+#e71425 rgb(231, 20, 37)
+#107c38 rgb(16, 124, 56)
+#144599 rgb(20, 69, 153)
+#eb661b rgb(235, 102, 27)
+#3d135b rgb(61, 19, 91)
+#8f0e5b rgb(143, 14, 91)
+#a21e82 rgb(162, 30, 130)
+*/
+#timeline rect {
+    fill: rgba(231, 20, 37, 0.5);
+}
+#timeline text {
+    fill: rgb(231, 20, 37);
+}
+#addresses rect {
+    fill: rgba(231, 20, 37, 0.5);
+}
+#addresses text {
+    fill: rgb(231, 20, 37);
+}
+#protocols rect {
+    fill: rgba(16, 124, 56, 0.5);
+}
+#protocols text {
+    fill: rgb(16, 124, 56);
+}
+#methods rect {
+    fill: rgba(20, 69, 153, 0.5);
+}
+#methods text {
+    fill: rgb(20, 69, 153);
+}
+#urls rect {
+    fill: rgba(235, 102, 27, 0.5);
+}
+#urls text {
+    fill: rgb(235, 102, 27);
+}
+#cookies rect {
+    fill: rgba(61, 19, 91, 0.5);
+}
+#cookies text {
+    fill: rgb(61, 19, 91);
+}
+#referrers rect {
+    fill: rgba(143, 14, 91, 0.5);
+}
+#referrers text {
+    fill: rgb(143, 14, 91);
+}
+#useragents rect {
+    fill: rgba(162, 30, 130, 0.5);
+}
+#useragents text {
+    fill: rgb(162, 30, 130);
+}
+#tooltip {
+    position: absolute;
+    padding: 4px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 4px;
+    pointer-events: none;
+}
+#tooltip th {
+    text-align: right;
+}
+#tooltip td {
+    text-align: left;
+}

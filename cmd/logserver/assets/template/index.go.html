@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="/static/styles.css"/>
+        <script src="/static/d3.v7.min.js"></script>
+        <script src="/static/charts.js"></script>
+        <title>Convey Logs - Aletheia Ware</title>
+    </head>
+
+    <body>
+        <h1>Hello Logs!</h1>
+
+        <a href="javascript:ClearFilters();">Clear Filters</a>
+
+        <!-- TODO add option to display raw data as rows in a table -->
+
+        <h2>Request Timeline</h2>
+
+        <div style="width: 100%; text-align: center;">
+            <input type="text" id="start-input" onkeydown="Update()" /> - <input type="text" id="end-input" onkeydown="Update()" />
+        </div>
+
+        <!-- add widget to control start/end time filter more easily -->
+
+        <svg id="timeline" />
+
+        <div class="tab">
+            <button class="tablinks" onclick="OpenView(event, 'aggregations')" id="defaultOpen"><h2>Aggregations</h2></button>
+            <button class="tablinks" onclick="OpenView(event, 'sessions')"><h2>Sessions</h2></button>
+        </div>
+
+        <div id="aggregations" class="tabcontent">
+            <table>
+                <tr>
+                    <th>Addresses</th>
+                    <th>Protocols</th>
+                    <th>Methods</th>
+                    <th>URLs</th>
+                    <th>Cookies</th>
+                    <th>Referrers</th>
+                    <th>User Agents</th>
+                </tr>
+                <tr>
+                    <td><input type="text" id="address-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="protocol-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="method-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="url-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="cookie-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="referrer-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="useragent-input" onkeydown="Update()" /></td>
+                </tr>
+                <tr>
+                    <td><svg id="addresses" /></td>
+                    <td><svg id="protocols" /></td>
+                    <td><svg id="methods" /></td>
+                    <td><svg id="urls" /></td>
+                    <td><svg id="cookies" /></td>
+                    <td><svg id="referrers" /></td>
+                    <td><svg id="useragents" /></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="sessions" class="tabcontent">
+            <!-- TODO add session flow query box -->
+            <svg id="sessions" />
+        </div>
+
+        <div id="tooltip" />
+
+        <script>
+            const startinput = document.getElementById('start-input');
+            const endinput = document.getElementById('end-input');
+            const addressinput = document.getElementById('address-input');
+            const protocolinput = document.getElementById('protocol-input');
+            const methodinput = document.getElementById('method-input');
+            const urlinput = document.getElementById('url-input');
+            const cookieinput = document.getElementById('cookie-input');
+            const referrerinput = document.getElementById('referrer-input');
+            const useragentinput = document.getElementById('useragent-input');
+
+            function ClearFilters() {
+                LoadData(new Map());
+            }
+
+            function Update() {
+                if(event.key === 'Enter') {
+                    UpdateFilters();
+                }
+            }
+
+            function UpdateFilters() {
+                const query = new Map();
+
+                if (startinput.value) {
+                    query.set('start', new Date(startinput.value).getTime() / 1000);
+                }
+
+                if (endinput.value) {
+                    query.set('end', new Date(endinput.value).getTime() / 1000);
+                }
+
+                if (addressinput.value) {
+                    query.set('address', addressinput.value);
+                }
+
+                if (protocolinput.value) {
+                    query.set('protocol', protocolinput.value);
+                }
+
+                if (methodinput.value) {
+                    query.set('method', methodinput.value);
+                }
+
+                if (urlinput.value) {
+                    query.set('url', encodeURIComponent(urlinput.value));
+                }
+
+                if (cookieinput.value) {
+                    query.set('cookie', encodeURIComponent(cookieinput.value));
+                }
+
+                if (referrerinput.value) {
+                    query.set('referrer', encodeURIComponent(referrerinput.value));
+                }
+
+                if (useragentinput.value) {
+                    query.set('useragent', encodeURIComponent(useragentinput.value));
+                }
+
+                LoadData(query);
+            }
+
+            function LoadData(query) {
+                if (query.has('start')) {
+                    startinput.value = new Date(query.get('start') * 1000).toISOString();
+                } else {
+                    startinput.value = null;
+                }
+
+                if (query.has('end')) {
+                    endinput.value = new Date(query.get('end') * 1000).toISOString();
+                } else {
+                    endinput.value = null;
+                }
+
+                if (query.has('address')) {
+                    addressinput.value = query.get('address');
+                } else {
+                    addressinput.value = null;
+                }
+
+                if (query.has('protocol')) {
+                    protocolinput.value = query.get('protocol');
+                } else {
+                    protocolinput.value = null;
+                }
+
+                if (query.has('method')) {
+                    methodinput.value = query.get('method');
+                } else {
+                    methodinput.value = null;
+                }
+
+                if (query.has('url')) {
+                    urlinput.value = decodeURIComponent(query.get('url'));
+                } else {
+                    urlinput.value = null;
+                }
+
+                if (query.has('cookie')) {
+                    cookieinput.value = decodeURIComponent(query.get('cookie'));
+                } else {
+                    cookieinput.value = null;
+                }
+
+                if (query.has('referrer')) {
+                    referrerinput.value = decodeURIComponent(query.get('referrer'));
+                } else {
+                    referrerinput.value = null;
+                }
+
+                if (query.has('useragent')) {
+                    useragentinput.value = decodeURIComponent(query.get('useragent'));
+                } else {
+                    useragentinput.value = null;
+                }
+
+                const parts = [];
+                for (const [key, value] of query) {
+                    parts.push(key + '=' + value);
+                }
+
+                var queryString = '';
+                if (parts.length > 0) {
+                    queryString = '?'+ parts.join('&');
+                }
+
+                const histogramWidth = window.innerWidth - (16 + 4);// body margin, table border spacing
+                const histogramHeight = window.innerHeight / 2;
+
+                d3.json('/requests.json' + queryString)
+                    .then(function(data) {
+                        Histogram('#timeline', histogramWidth, histogramHeight, data.start, data.end, data.rows, function(data) {
+                            return data.timestamp;
+                        }, function(data) {
+                            return '<table><tr><th>From</th><td>' + data.x0.toISOString() + '</td></tr><tr><th>To</th><td>' + data.x1.toISOString() + '</td></tr><tr><th>Count</th><td>' + data.length + '</td></tr></table>'
+                        }, function(event, data) {
+                            query.set('start', data.x0.getTime() / 1000);
+                            query.set('end', data.x1.getTime() / 1000);
+                            LoadData(query);
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                const barChartCount = 7;
+                const barWidth = (window.innerWidth - (16 + 4)) / barChartCount - 4;// body margin, table border spacing
+
+                d3.json('/addresses.json' + queryString)
+                    .then(function(data) {
+                        HBar('#addresses', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.address;
+                        }, function(event, data) {
+                            query.set('address', data.address);
+                            LoadData(query);
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                d3.json('/protocols.json' + queryString)
+                    .then(function(data) {
+                        HBar('#protocols', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.protocol;
+                        }, function(event, data) {
+                            query.set('protocol', data.protocol);
+                            LoadData(query)
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                d3.json('/methods.json' + queryString)
+                    .then(function(data) {
+                        HBar('#methods', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.method;
+                        }, function(event, data) {
+                            query.set('method', data.method);
+                            LoadData(query)
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                d3.json('/urls.json' + queryString)
+                    .then(function(data) {
+                        HBar('#urls', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.url;
+                        }, function(event, data) {
+                            query.set('url', encodeURIComponent(data.url));
+                            LoadData(query)
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                d3.json('/cookies.json' + queryString)
+                    .then(function(data) {
+                        HBar('#cookies', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.cookie;
+                        }, function(event, data) {
+                            query.set('cookie', encodeURIComponent(data.cookie));
+                            LoadData(query)
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                d3.json('/referrers.json' + queryString)
+                    .then(function(data) {
+                        HBar('#referrers', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.referrer;
+                        }, function(event, data) {
+                            query.set('referrer', encodeURIComponent(data.referrer));
+                            LoadData(query)
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                d3.json('/useragents.json' + queryString)
+                    .then(function(data) {
+                        HBar('#useragents', barWidth, 0, data.limit, data.rows, function(data) {
+                            return data.count
+                        }, function(data) {
+                            return data.useragent;
+                        }, function(event, data) {
+                            query.set('useragent', encodeURIComponent(data.useragent));
+                            LoadData(query)
+                        });
+                    })
+                    .catch(function(error) {
+                        console.warn(error);
+                    });
+
+                /* TODO show session data
+                search box to enter a query like "/,/static,/digest,/best,/recent,/conversation,/content,/about,/subscribe-digest,/sign-up,/sign-up-verification,/sign-in,/account,/account-password,/account-recovery,/account-deactivate,/notification,/coin-buy,/publish,/reply,/gift,/delete,/stripe,/sign-out"
+                X: query
+                Y: addresses
+                sorted Y by number of matches with query
+                colored green for hit, red for miss
+                */
+            }
+
+            const query = new Map();
+            // default to start of year
+            query.set('start', new Date(Date.UTC(new Date().getFullYear())).getTime() / 1000);
+            LoadData(query);
+
+            const tabcontent = document.getElementsByClassName("tabcontent");
+            const tablinks = document.getElementsByClassName("tablinks");
+
+            function OpenView(event, view) {
+                for (var i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                
+                for (var i = 0; i < tablinks.length; i++) {
+                    tablinks[i].className = tablinks[i].className.replace(" active", "");
+                }
+                document.getElementById(view).style.display = "block";
+                event.currentTarget.className += " active";
+            }
+
+            document.getElementById("defaultOpen").click();
+        </script>
+    </body>
+</html>
