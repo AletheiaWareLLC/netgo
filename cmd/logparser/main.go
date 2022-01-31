@@ -17,26 +17,27 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
+	"strings"
 )
 
+var sources = flag.String("sources", "log.go:", "Log Sources")
+
 func main() {
+	flag.Parse()
+
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	logs := os.Args[1:]
+	logs := flag.Args()
 	if len(logs) == 0 {
 		logs = append(logs, "logs")
 	}
 
 	os.Remove("log.db")
 
-	count, err := Parse("log.db", []string{
-		"log.go:",
-		"net.go:39:",
-		"net.go:44:",
-		"net.go:47:",
-	}, logs)
+	count, err := Parse("log.db", strings.Split(*sources, ","), logs)
 	if err != nil {
 		log.Fatal(err)
 	}
