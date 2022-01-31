@@ -16,12 +16,19 @@
 
 package main
 
-import "log"
+import (
+	"flag"
+	"log"
+)
+
+var sqlite = flag.String("sqlite", "log.db", "Sqlite Database Name")
 
 func main() {
+	flag.Parse()
+
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	if err := Serve(); err != nil {
+	if err := Serve(*sqlite); err != nil {
 		log.Fatal(err)
 	}
 }

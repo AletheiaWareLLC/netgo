@@ -19,10 +19,10 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
 	"strings"
 )
 
+var sqlite = flag.String("sqlite", "log.db", "Sqlite Database Name")
 var sources = flag.String("sources", "log.go:", "Log Sources")
 
 func main() {
@@ -35,9 +35,7 @@ func main() {
 		logs = append(logs, "logs")
 	}
 
-	os.Remove("log.db")
-
-	count, err := Parse("log.db", strings.Split(*sources, ","), logs)
+	count, err := Parse(*sqlite, strings.Split(*sources, ","), logs)
 	if err != nil {
 		log.Fatal(err)
 	}

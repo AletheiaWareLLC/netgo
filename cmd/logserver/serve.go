@@ -37,7 +37,7 @@ import (
 //go:embed assets
 var embeddedFS embed.FS
 
-func Serve() error {
+func Serve(name string) error {
 	logFile, err := netgo.SetupLogging()
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func Serve() error {
 	defer logFile.Close()
 	log.Println("Log File:", logFile.Name())
 
-	db, err := sql.Open("sqlite3", "./log.db")
+	db, err := sql.Open("sqlite3", name)
 	if err != nil {
 		return err
 	}
