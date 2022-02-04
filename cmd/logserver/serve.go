@@ -75,7 +75,7 @@ func Serve(name string) error {
 	// TODO sessions - how a single address interacted with the server over time
 
 	// Handle Request Data
-	mux.Handle("/requests.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/requests.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_requests.timestamp, tbl_requests.address, tbl_requests.protocol, tbl_requests.method, tbl_requests.host, tbl_requests.url FROM tbl_requests`
 		raw += requestFiltersFromQuery(r.URL.Query())
 		rows, err := db.Query(raw)
@@ -108,9 +108,9 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 	// Handle Address Data
-	mux.Handle("/addresses.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/addresses.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_requests.address, COUNT(tbl_requests.id) AS count FROM tbl_requests`
 		raw += requestFiltersFromQuery(r.URL.Query())
 		raw += ` GROUP BY tbl_requests.address`
@@ -141,9 +141,9 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 	// Handle Protocol Data
-	mux.Handle("/protocols.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/protocols.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_requests.protocol, COUNT(tbl_requests.id) AS count FROM tbl_requests`
 		raw += requestFiltersFromQuery(r.URL.Query())
 		raw += ` GROUP BY tbl_requests.protocol`
@@ -174,9 +174,9 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 	// Handle Method Data
-	mux.Handle("/methods.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/methods.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_requests.method, COUNT(tbl_requests.id) AS count FROM tbl_requests`
 		raw += requestFiltersFromQuery(r.URL.Query())
 		raw += ` GROUP BY tbl_requests.method`
@@ -207,9 +207,9 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 	// Handle URL Data
-	mux.Handle("/urls.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/urls.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_requests.url, COUNT(tbl_requests.id) AS count FROM tbl_requests`
 		raw += requestFiltersFromQuery(r.URL.Query())
 		raw += ` GROUP BY tbl_requests.url`
@@ -240,9 +240,9 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 	// Handle Header Key Data
-	mux.Handle("/header-keys.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/header-keys.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_headers.key, COUNT(tbl_headers.id) AS count FROM tbl_headers`
 		raw += headerFiltersFromQuery(r.URL.Query())
 		raw += ` GROUP BY tbl_headers.key`
@@ -273,9 +273,9 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 	// Handle Header Value Data
-	mux.Handle("/header-values.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/header-values.json", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		raw := `SELECT tbl_headers.value, COUNT(tbl_headers.id) AS count FROM tbl_headers`
 		raw += headerFiltersFromQuery(r.URL.Query())
 		raw += ` GROUP BY tbl_headers.value`
@@ -306,10 +306,10 @@ func Serve(name string) error {
 		if err := json.NewEncoder(w).Encode(result); err != nil {
 			log.Fatal(err)
 		}
-	})))
+	}))))
 
 	// Handle Index
-	mux.Handle("/", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/", handler.Log(handler.Compress(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := templates.ExecuteTemplate(w, "index.go.html", &struct {
 			Live bool
 		}{
@@ -317,7 +317,7 @@ func Serve(name string) error {
 		}); err != nil {
 			log.Println(err)
 		}
-	})))
+	}))))
 
 	// Serve HTTP Requests
 	log.Println("HTTP Server Listening on :80")
