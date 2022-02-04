@@ -24,18 +24,13 @@ type Requests struct {
 }
 
 type Request struct {
-	Id        int    `json:"id"`
-	File      string `json:"file"`
-	Timestamp int64  `json:"timestamp"`
-	Source    string `json:"source"`
-	Address   string `json:"address"`
-	Protocol  string `json:"protocol"`
-	Method    string `json:"method"`
-	Host      string `json:"host"`
-	URL       string `json:"url"`
-	Cookie    string `json:"cookie"`
-	Referrer  string `json:"referrer"`
-	UserAgent string `json:"useragent"`
+	Timestamp int64             `json:"timestamp"`
+	Address   string            `json:"address"`
+	Protocol  string            `json:"protocol"`
+	Method    string            `json:"method"`
+	Host      string            `json:"host"`
+	URL       string            `json:"url"`
+	Headers   map[string]string `json:"headers"`
 }
 
 type Addresses struct {
@@ -82,35 +77,14 @@ type URL struct {
 	Count int    `json:"count"`
 }
 
-type Cookies struct {
+type Headers struct {
 	Total int       `json:"total"`
 	Limit int       `json:"limit"`
-	Rows  []*Cookie `json:"rows"`
+	Rows  []*Header `json:"rows"`
 }
 
-type Cookie struct {
-	Cookie string `json:"cookie"`
-	Count  int    `json:"count"`
-}
-
-type Referrers struct {
-	Total int         `json:"total"`
-	Limit int         `json:"limit"`
-	Rows  []*Referrer `json:"rows"`
-}
-
-type Referrer struct {
-	Referrer string `json:"referrer"`
-	Count    int    `json:"count"`
-}
-
-type UserAgents struct {
-	Total int          `json:"total"`
-	Limit int          `json:"limit"`
-	Rows  []*UserAgent `json:"rows"`
-}
-
-type UserAgent struct {
-	UserAgent string `json:"useragent"`
-	Count     int    `json:"count"`
+type Header struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+	Count int    `json:"count"`
 }

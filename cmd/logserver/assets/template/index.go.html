@@ -14,59 +14,64 @@
 
         <a href="javascript:ClearFilters();">Clear Filters</a>
 
-        <!-- TODO add option to display raw data as rows in a table -->
-
-        <h2>Request Timeline</h2>
+        <h2>TIMELINE</h2>
 
         <div style="width: 100%; text-align: center;">
             <input type="text" id="start-input" onkeydown="Update()" /> - <input type="text" id="end-input" onkeydown="Update()" />
         </div>
 
-        <!-- add widget to control start/end time filter more easily -->
+        <!-- TODO add widget to control start/end time filter more easily -->
 
         <svg id="timeline" />
 
         <div class="tab">
             <button class="tablinks" onclick="OpenView(event, 'aggregations')" id="defaultOpen"><h2>Aggregations</h2></button>
+            <button class="tablinks" onclick="OpenView(event, 'rawlogs')"><h2>Raw Logs</h2></button>
             <button class="tablinks" onclick="OpenView(event, 'sessions')"><h2>Sessions</h2></button>
         </div>
 
         <div id="aggregations" class="tabcontent">
             <table>
                 <tr>
-                    <th>Addresses</th>
-                    <th>Protocols</th>
-                    <th>Methods</th>
-                    <th>URLs</th>
-                    <th>Cookies</th>
-                    <th>Referrers</th>
-                    <th>User Agents</th>
+                    <th>ADDRESS</th>
+                    <th>PROTOCOL</th>
+                    <th>METHOD</th>
+                    <th>URL</th>
+                    <th>HEADER KEY</th>
+                    <th>HEADER VALUE</th>
                 </tr>
                 <tr>
                     <td><input type="text" id="address-input" onkeydown="Update()" /></td>
                     <td><input type="text" id="protocol-input" onkeydown="Update()" /></td>
                     <td><input type="text" id="method-input" onkeydown="Update()" /></td>
                     <td><input type="text" id="url-input" onkeydown="Update()" /></td>
-                    <td><input type="text" id="cookie-input" onkeydown="Update()" /></td>
-                    <td><input type="text" id="referrer-input" onkeydown="Update()" /></td>
-                    <td><input type="text" id="useragent-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="header-key-input" onkeydown="Update()" /></td>
+                    <td><input type="text" id="header-value-input" onkeydown="Update()" /></td>
                 </tr>
                 <tr>
                     <td><svg id="addresses" /></td>
                     <td><svg id="protocols" /></td>
                     <td><svg id="methods" /></td>
                     <td><svg id="urls" /></td>
-                    <td><svg id="cookies" /></td>
-                    <td><svg id="referrers" /></td>
-                    <td><svg id="useragents" /></td>
+                    <td><svg id="header-keys" /></td>
+                    <td><svg id="header-values" /></td>
                 </tr>
             </table>
         </div>
 
         <div id="sessions" class="tabcontent">
-            <!-- TODO add session flow query box -->
+            <!--
+                TODO add session flow search box to enter a query.
+                eg. "/,/static,/digest,/best,/recent,/conversation,/content,/about,/subscribe-digest,/sign-up,/sign-up-verification,/sign-in,/account,/account-password,/account-recovery,/account-deactivate,/notification,/coin-buy,/publish,/reply,/gift,/delete,/stripe,/sign-out"
+                X: query
+                Y: addresses
+                sorted Y by number of matches with query
+                colored green for hit, red for miss
+            -->
             <svg id="sessions" />
         </div>
+
+        <div id="rawlogs" class="tabcontent"></div>
 
         <div id="tooltip" />
 
@@ -77,9 +82,8 @@
             const protocolinput = document.getElementById('protocol-input');
             const methodinput = document.getElementById('method-input');
             const urlinput = document.getElementById('url-input');
-            const cookieinput = document.getElementById('cookie-input');
-            const referrerinput = document.getElementById('referrer-input');
-            const useragentinput = document.getElementById('useragent-input');
+            const headerkeyinput = document.getElementById('header-key-input');
+            const headervalueinput = document.getElementById('header-value-input');
 
             function ClearFilters() {
                 LoadData(new Map());
@@ -118,22 +122,21 @@
                     query.set('url', encodeURIComponent(urlinput.value));
                 }
 
-                if (cookieinput.value) {
-                    query.set('cookie', encodeURIComponent(cookieinput.value));
+                if (headerkeyinput.value) {
+                    query.set('header-key', encodeURIComponent(headerkeyinput.value));
                 }
 
-                if (referrerinput.value) {
-                    query.set('referrer', encodeURIComponent(referrerinput.value));
-                }
-
-                if (useragentinput.value) {
-                    query.set('useragent', encodeURIComponent(useragentinput.value));
+                if (headervalueinput.value) {
+                    query.set('header-value', encodeURIComponent(headervalueinput.value));
                 }
 
                 LoadData(query);
             }
 
             function LoadData(query) {
+                // TODO scroll to top
+                // TODO set cursor to loading
+
                 if (query.has('start')) {
                     startinput.value = new Date(query.get('start') * 1000).toISOString();
                 } else {
@@ -170,22 +173,16 @@
                     urlinput.value = null;
                 }
 
-                if (query.has('cookie')) {
-                    cookieinput.value = decodeURIComponent(query.get('cookie'));
+                if (query.has('header-key')) {
+                    headerkeyinput.value = decodeURIComponent(query.get('header-key'));
                 } else {
-                    cookieinput.value = null;
+                    headerkeyinput.value = null;
                 }
 
-                if (query.has('referrer')) {
-                    referrerinput.value = decodeURIComponent(query.get('referrer'));
+                if (query.has('header-value')) {
+                    headervalueinput.value = decodeURIComponent(query.get('header-value'));
                 } else {
-                    referrerinput.value = null;
-                }
-
-                if (query.has('useragent')) {
-                    useragentinput.value = decodeURIComponent(query.get('useragent'));
-                } else {
-                    useragentinput.value = null;
+                    headervalueinput.value = null;
                 }
 
                 const parts = [];
@@ -203,6 +200,8 @@
 
                 d3.json('/requests.json' + queryString)
                     .then(function(data) {
+                        startinput.value = new Date(data.start * 1000).toISOString();
+                        endinput.value = new Date(data.end * 1000).toISOString();
                         Histogram('#timeline', histogramWidth, histogramHeight, data.start, data.end, data.rows, function(data) {
                             return data.timestamp;
                         }, function(data) {
@@ -212,12 +211,55 @@
                             query.set('end', data.x1.getTime() / 1000);
                             LoadData(query);
                         });
+
+                        const columns = ['timestamp', 'address', 'protocol', 'method', 'host', 'url'];
+
+                        d3.select('#rawlogs').selectAll('*').remove();
+
+                        if (data.rows.length > 200) {
+                            d3.select('#rawlogs')
+                                .append(`p`)
+                                .text("Too many rows, try filtering the dataset.");
+                        } else {
+                            const table = d3.select('#rawlogs')
+                                .append('table');
+
+                            const thead = table.append('thead');
+                            thead.selectAll('th')
+                                .data(columns)
+                                .enter()
+                                .append('th')
+                                .text(function (column) {
+                                    return column.toUpperCase();
+                                });
+
+                            const tbody = table.append('tbody');
+
+                            const rows = tbody.selectAll('tr')
+                                .data(data.rows)
+                                .enter()
+                                .append('tr');
+
+                            const cells = rows.selectAll('td')
+                                .data(function (row) {
+                                    return columns.map(function (column) {
+                                        var v = row[column];
+                                        if (column === 'timestamp') {
+                                            v = new Date(v * 1000).toISOString();
+                                        }
+                                        return {column: column, value: v};
+                                    });
+                                })
+                                .enter()
+                                .append('td')
+                                .text(function (data) { return data.value; });
+                        }
                     })
                     .catch(function(error) {
                         console.warn(error);
                     });
 
-                const barChartCount = 7;
+                const barChartCount = 6;
                 const barWidth = (window.innerWidth - (16 + 4)) / barChartCount - 4;// body margin, table border spacing
 
                 d3.json('/addresses.json' + queryString)
@@ -280,14 +322,14 @@
                         console.warn(error);
                     });
 
-                d3.json('/cookies.json' + queryString)
+                d3.json('/header-keys.json' + queryString)
                     .then(function(data) {
-                        HBar('#cookies', barWidth, 0, data.limit, data.rows, function(data) {
+                        HBar('#header-keys', barWidth, 0, data.limit, data.rows, function(data) {
                             return data.count
                         }, function(data) {
-                            return data.cookie;
+                            return data.key;
                         }, function(event, data) {
-                            query.set('cookie', encodeURIComponent(data.cookie));
+                            query.set('header-key', encodeURIComponent(data.key));
                             LoadData(query)
                         });
                     })
@@ -295,43 +337,20 @@
                         console.warn(error);
                     });
 
-                d3.json('/referrers.json' + queryString)
+                d3.json('/header-values.json' + queryString)
                     .then(function(data) {
-                        HBar('#referrers', barWidth, 0, data.limit, data.rows, function(data) {
+                        HBar('#header-values', barWidth, 0, data.limit, data.rows, function(data) {
                             return data.count
                         }, function(data) {
-                            return data.referrer;
+                            return data.value;
                         }, function(event, data) {
-                            query.set('referrer', encodeURIComponent(data.referrer));
+                            query.set('header-value', encodeURIComponent(data.value));
                             LoadData(query)
                         });
                     })
                     .catch(function(error) {
                         console.warn(error);
                     });
-
-                d3.json('/useragents.json' + queryString)
-                    .then(function(data) {
-                        HBar('#useragents', barWidth, 0, data.limit, data.rows, function(data) {
-                            return data.count
-                        }, function(data) {
-                            return data.useragent;
-                        }, function(event, data) {
-                            query.set('useragent', encodeURIComponent(data.useragent));
-                            LoadData(query)
-                        });
-                    })
-                    .catch(function(error) {
-                        console.warn(error);
-                    });
-
-                /* TODO show session data
-                search box to enter a query like "/,/static,/digest,/best,/recent,/conversation,/content,/about,/subscribe-digest,/sign-up,/sign-up-verification,/sign-in,/account,/account-password,/account-recovery,/account-deactivate,/notification,/coin-buy,/publish,/reply,/gift,/delete,/stripe,/sign-out"
-                X: query
-                Y: addresses
-                sorted Y by number of matches with query
-                colored green for hit, red for miss
-                */
             }
 
             const query = new Map();

@@ -76,10 +76,8 @@ func Serve(name string) error {
 
 	// Handle Request Data
 	mux.Handle("/requests.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT * FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
+		raw := `SELECT tbl_requests.timestamp, tbl_requests.address, tbl_requests.protocol, tbl_requests.method, tbl_requests.host, tbl_requests.url FROM tbl_requests`
+		raw += requestFiltersFromQuery(r.URL.Query())
 		rows, err := db.Query(raw)
 		if err != nil {
 			log.Fatal(err)
@@ -91,7 +89,7 @@ func Serve(name string) error {
 		}
 		for rows.Next() {
 			r := &Request{}
-			err = rows.Scan(&r.Id, &r.File, &r.Timestamp, &r.Source, &r.Address, &r.Protocol, &r.Method, &r.Host, &r.URL, &r.Cookie, &r.Referrer, &r.UserAgent)
+			err = rows.Scan(&r.Timestamp, &r.Address, &r.Protocol, &r.Method, &r.Host, &r.URL)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -113,11 +111,9 @@ func Serve(name string) error {
 	})))
 	// Handle Address Data
 	mux.Handle("/addresses.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT address, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY address`
+		raw := `SELECT tbl_requests.address, COUNT(tbl_requests.id) AS count FROM tbl_requests`
+		raw += requestFiltersFromQuery(r.URL.Query())
+		raw += ` GROUP BY tbl_requests.address`
 		raw += ` ORDER BY count DESC`
 		raw += ` LIMIT 1000`
 		rows, err := db.Query(raw)
@@ -148,11 +144,9 @@ func Serve(name string) error {
 	})))
 	// Handle Protocol Data
 	mux.Handle("/protocols.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT protocol, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY protocol`
+		raw := `SELECT tbl_requests.protocol, COUNT(tbl_requests.id) AS count FROM tbl_requests`
+		raw += requestFiltersFromQuery(r.URL.Query())
+		raw += ` GROUP BY tbl_requests.protocol`
 		raw += ` ORDER BY count DESC`
 		raw += ` LIMIT 1000`
 		rows, err := db.Query(raw)
@@ -163,16 +157,16 @@ func Serve(name string) error {
 
 		result := &Protocols{}
 		for rows.Next() {
-			a := &Protocol{}
-			err = rows.Scan(&a.Protocol, &a.Count)
+			p := &Protocol{}
+			err = rows.Scan(&p.Protocol, &p.Count)
 			if err != nil {
 				log.Fatal(err)
 			}
-			result.Total += a.Count
-			if a.Count > result.Limit {
-				result.Limit = a.Count
+			result.Total += p.Count
+			if p.Count > result.Limit {
+				result.Limit = p.Count
 			}
-			result.Rows = append(result.Rows, a)
+			result.Rows = append(result.Rows, p)
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatal(err)
@@ -183,11 +177,9 @@ func Serve(name string) error {
 	})))
 	// Handle Method Data
 	mux.Handle("/methods.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT method, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY method`
+		raw := `SELECT tbl_requests.method, COUNT(tbl_requests.id) AS count FROM tbl_requests`
+		raw += requestFiltersFromQuery(r.URL.Query())
+		raw += ` GROUP BY tbl_requests.method`
 		raw += ` ORDER BY count DESC`
 		raw += ` LIMIT 1000`
 		rows, err := db.Query(raw)
@@ -198,16 +190,16 @@ func Serve(name string) error {
 
 		result := &Methods{}
 		for rows.Next() {
-			a := &Method{}
-			err = rows.Scan(&a.Method, &a.Count)
+			m := &Method{}
+			err = rows.Scan(&m.Method, &m.Count)
 			if err != nil {
 				log.Fatal(err)
 			}
-			result.Total += a.Count
-			if a.Count > result.Limit {
-				result.Limit = a.Count
+			result.Total += m.Count
+			if m.Count > result.Limit {
+				result.Limit = m.Count
 			}
-			result.Rows = append(result.Rows, a)
+			result.Rows = append(result.Rows, m)
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatal(err)
@@ -218,11 +210,9 @@ func Serve(name string) error {
 	})))
 	// Handle URL Data
 	mux.Handle("/urls.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT url, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY url`
+		raw := `SELECT tbl_requests.url, COUNT(tbl_requests.id) AS count FROM tbl_requests`
+		raw += requestFiltersFromQuery(r.URL.Query())
+		raw += ` GROUP BY tbl_requests.url`
 		raw += ` ORDER BY count DESC`
 		raw += ` LIMIT 1000`
 		rows, err := db.Query(raw)
@@ -233,16 +223,16 @@ func Serve(name string) error {
 
 		result := &URLs{}
 		for rows.Next() {
-			a := &URL{}
-			err = rows.Scan(&a.URL, &a.Count)
+			u := &URL{}
+			err = rows.Scan(&u.URL, &u.Count)
 			if err != nil {
 				log.Fatal(err)
 			}
-			result.Total += a.Count
-			if a.Count > result.Limit {
-				result.Limit = a.Count
+			result.Total += u.Count
+			if u.Count > result.Limit {
+				result.Limit = u.Count
 			}
-			result.Rows = append(result.Rows, a)
+			result.Rows = append(result.Rows, u)
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatal(err)
@@ -251,13 +241,11 @@ func Serve(name string) error {
 			log.Fatal(err)
 		}
 	})))
-	// Handle Cookie Data
-	mux.Handle("/cookies.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT cookie, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY cookie`
+	// Handle Header Key Data
+	mux.Handle("/header-keys.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		raw := `SELECT tbl_headers.key, COUNT(tbl_headers.id) AS count FROM tbl_headers`
+		raw += headerFiltersFromQuery(r.URL.Query())
+		raw += ` GROUP BY tbl_headers.key`
 		raw += ` ORDER BY count DESC`
 		raw += ` LIMIT 1000`
 		rows, err := db.Query(raw)
@@ -266,18 +254,18 @@ func Serve(name string) error {
 		}
 		defer rows.Close()
 
-		result := &Cookies{}
+		result := &Headers{}
 		for rows.Next() {
-			a := &Cookie{}
-			err = rows.Scan(&a.Cookie, &a.Count)
+			h := &Header{}
+			err = rows.Scan(&h.Key, &h.Count)
 			if err != nil {
 				log.Fatal(err)
 			}
-			result.Total += a.Count
-			if a.Count > result.Limit {
-				result.Limit = a.Count
+			result.Total += h.Count
+			if h.Count > result.Limit {
+				result.Limit = h.Count
 			}
-			result.Rows = append(result.Rows, a)
+			result.Rows = append(result.Rows, h)
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatal(err)
@@ -286,13 +274,11 @@ func Serve(name string) error {
 			log.Fatal(err)
 		}
 	})))
-	// Handle Referrer Data
-	mux.Handle("/referrers.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT referrer, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY referrer`
+	// Handle Header Value Data
+	mux.Handle("/header-values.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		raw := `SELECT tbl_headers.value, COUNT(tbl_headers.id) AS count FROM tbl_headers`
+		raw += headerFiltersFromQuery(r.URL.Query())
+		raw += ` GROUP BY tbl_headers.value`
 		raw += ` ORDER BY count DESC`
 		raw += ` LIMIT 1000`
 		rows, err := db.Query(raw)
@@ -301,53 +287,18 @@ func Serve(name string) error {
 		}
 		defer rows.Close()
 
-		result := &Referrers{}
+		result := &Headers{}
 		for rows.Next() {
-			a := &Referrer{}
-			err = rows.Scan(&a.Referrer, &a.Count)
+			h := &Header{}
+			err = rows.Scan(&h.Value, &h.Count)
 			if err != nil {
 				log.Fatal(err)
 			}
-			result.Total += a.Count
-			if a.Count > result.Limit {
-				result.Limit = a.Count
+			result.Total += h.Count
+			if h.Count > result.Limit {
+				result.Limit = h.Count
 			}
-			result.Rows = append(result.Rows, a)
-		}
-		if err := rows.Err(); err != nil {
-			log.Fatal(err)
-		}
-		if err := json.NewEncoder(w).Encode(result); err != nil {
-			log.Fatal(err)
-		}
-	})))
-	// Handle UserAgent Data
-	mux.Handle("/useragents.json", handler.Log(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		raw := `SELECT useragent, COUNT(id) AS count FROM tbl_requests`
-		if filters := filtersFromQuery(r.URL.Query()); len(filters) > 0 {
-			raw += ` WHERE ` + strings.Join(filters, ` AND `)
-		}
-		raw += ` GROUP BY useragent`
-		raw += ` ORDER BY count DESC`
-		raw += ` LIMIT 1000`
-		rows, err := db.Query(raw)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer rows.Close()
-
-		result := &UserAgents{}
-		for rows.Next() {
-			a := &UserAgent{}
-			err = rows.Scan(&a.UserAgent, &a.Count)
-			if err != nil {
-				log.Fatal(err)
-			}
-			result.Total += a.Count
-			if a.Count > result.Limit {
-				result.Limit = a.Count
-			}
-			result.Rows = append(result.Rows, a)
+			result.Rows = append(result.Rows, h)
 		}
 		if err := rows.Err(); err != nil {
 			log.Fatal(err)
@@ -376,42 +327,92 @@ func Serve(name string) error {
 	return nil
 }
 
-func filtersFromQuery(query url.Values) (filters []string) {
+func requestFiltersFromQuery(query url.Values) (result string) {
+	var headerfilters []string
+	hkey := netgo.QueryParameter(query, "header-key")
+	if hkey != "" {
+		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.key = '%s'`, hkey))
+	}
+	hvalue := netgo.QueryParameter(query, "header-value")
+	if hvalue != "" {
+		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.value = '%s'`, hvalue))
+	}
+	if len(headerfilters) > 0 {
+		result += ` INNER JOIN tbl_headers ON tbl_requests.id = tbl_headers.request AND ` + strings.Join(headerfilters, ` AND `)
+	}
+
+	var requestfilters []string
 	start := netgo.ParseInt(netgo.QueryParameter(query, "start"))
 	if start != 0 {
-		filters = append(filters, fmt.Sprintf(`timestamp > %d`, start))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp > %d`, start))
 	}
 	end := netgo.ParseInt(netgo.QueryParameter(query, "end"))
 	if end != 0 {
-		filters = append(filters, fmt.Sprintf(`timestamp < %d`, end))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp < %d`, end))
 	}
 	address := netgo.QueryParameter(query, "address")
 	if address != "" {
-		filters = append(filters, fmt.Sprintf(`address = '%s'`, address))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.address = '%s'`, address))
 	}
 	protocol := netgo.QueryParameter(query, "protocol")
 	if protocol != "" {
-		filters = append(filters, fmt.Sprintf(`protocol = '%s'`, protocol))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.protocol = '%s'`, protocol))
 	}
 	method := netgo.QueryParameter(query, "method")
 	if method != "" {
-		filters = append(filters, fmt.Sprintf(`method = '%s'`, method))
-	}
-	cookie := netgo.QueryParameter(query, "cookie")
-	if cookie != "" {
-		filters = append(filters, fmt.Sprintf(`cookie = '%s'`, cookie))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.method = '%s'`, method))
 	}
 	url := netgo.QueryParameter(query, "url")
 	if url != "" {
-		filters = append(filters, fmt.Sprintf(`url = '%s'`, url))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.url = '%s'`, url))
 	}
-	referrer := netgo.QueryParameter(query, "referrer")
-	if referrer != "" {
-		filters = append(filters, fmt.Sprintf(`referrer = '%s'`, referrer))
+	if len(requestfilters) > 0 {
+		result += ` WHERE ` + strings.Join(requestfilters, ` AND `)
 	}
-	useragent := netgo.QueryParameter(query, "useragent")
-	if useragent != "" {
-		filters = append(filters, fmt.Sprintf(`useragent = '%s'`, useragent))
+	return
+}
+
+func headerFiltersFromQuery(query url.Values) (result string) {
+	var requestfilters []string
+	start := netgo.ParseInt(netgo.QueryParameter(query, "start"))
+	if start != 0 {
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp > %d`, start))
+	}
+	end := netgo.ParseInt(netgo.QueryParameter(query, "end"))
+	if end != 0 {
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp < %d`, end))
+	}
+	address := netgo.QueryParameter(query, "address")
+	if address != "" {
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.address = '%s'`, address))
+	}
+	protocol := netgo.QueryParameter(query, "protocol")
+	if protocol != "" {
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.protocol = '%s'`, protocol))
+	}
+	method := netgo.QueryParameter(query, "method")
+	if method != "" {
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.method = '%s'`, method))
+	}
+	url := netgo.QueryParameter(query, "url")
+	if url != "" {
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.url = '%s'`, url))
+	}
+	if len(requestfilters) > 0 {
+		result += ` INNER JOIN tbl_requests ON tbl_requests.id = tbl_headers.request AND ` + strings.Join(requestfilters, ` AND `)
+	}
+
+	var headerfilters []string
+	hkey := netgo.QueryParameter(query, "header-key")
+	if hkey != "" {
+		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.key = '%s'`, hkey))
+	}
+	hvalue := netgo.QueryParameter(query, "header-value")
+	if hvalue != "" {
+		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.value = '%s'`, hvalue))
+	}
+	if len(headerfilters) > 0 {
+		result += ` WHERE ` + strings.Join(headerfilters, ` AND `)
 	}
 	return
 }

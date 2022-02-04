@@ -7,16 +7,11 @@ body {
 table {
     width: 100%;
 }
-#filters th {
-    text-align: right;
-    width: 50%;
-}
-#filters td {
-    text-align: left;
-    width: 50%;
-}
 td {
     vertical-align: top;
+}
+#rawlogs table {
+    max-width: 100%;
 }
 svg text {
     font-size: 16px;
@@ -43,7 +38,7 @@ svg text {
     display: none;
     border: none;
 }
-#address-input, #protocol-input, #method-input, #url-input, #cookie-input, #referrer-input, #useragent-input {
+#address-input, #protocol-input, #method-input, #url-input, #header-key-input, #header-value-input {
     width: calc(100% - 8px);
 }
 /*
@@ -64,45 +59,39 @@ https://nbisweden.github.io/Rcourse/files/rules_for_using_color.pdf
     fill: rgb(231, 20, 37);
 }
 #addresses rect {
-    fill: rgba(231, 20, 37, 0.5);
-}
-#addresses text {
-    fill: rgb(231, 20, 37);
-}
-#protocols rect {
     fill: rgba(16, 124, 56, 0.5);
 }
-#protocols text {
+#addresses text {
     fill: rgb(16, 124, 56);
 }
-#methods rect {
+#protocols rect {
     fill: rgba(20, 69, 153, 0.5);
 }
-#methods text {
+#protocols text {
     fill: rgb(20, 69, 153);
 }
-#urls rect {
+#methods rect {
     fill: rgba(235, 102, 27, 0.5);
 }
-#urls text {
+#methods text {
     fill: rgb(235, 102, 27);
 }
-#cookies rect {
+#urls rect {
     fill: rgba(61, 19, 91, 0.5);
 }
-#cookies text {
+#urls text {
     fill: rgb(61, 19, 91);
 }
-#referrers rect {
+#header-keys rect {
     fill: rgba(143, 14, 91, 0.5);
 }
-#referrers text {
+#header-keys text {
     fill: rgb(143, 14, 91);
 }
-#useragents rect {
+#header-values rect {
     fill: rgba(162, 30, 130, 0.5);
 }
-#useragents text {
+#header-values text {
     fill: rgb(162, 30, 130);
 }
 #tooltip {
