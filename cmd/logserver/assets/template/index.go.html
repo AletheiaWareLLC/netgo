@@ -26,7 +26,7 @@
 
         <div class="tab">
             <button class="tablinks" onclick="OpenView(event, 'aggregations')" id="defaultOpen"><h2>Aggregations</h2></button>
-            <button class="tablinks" onclick="OpenView(event, 'rawlogs')"><h2>Raw Logs</h2></button>
+            <button class="tablinks" onclick="OpenView(event, 'requests')"><h2>Requests</h2></button>
             <button class="tablinks" onclick="OpenView(event, 'sessions')"><h2>Sessions</h2></button>
         </div>
 
@@ -71,7 +71,7 @@
             <svg id="sessions" />
         </div>
 
-        <div id="rawlogs" class="tabcontent"></div>
+        <div id="requests" class="tabcontent"></div>
 
         <div id="tooltip" />
 
@@ -214,14 +214,14 @@
 
                         const columns = ['timestamp', 'address', 'protocol', 'method', 'host', 'url'];
 
-                        d3.select('#rawlogs').selectAll('*').remove();
+                        d3.select('#requests').selectAll('*').remove();
 
                         if (data.rows.length > 200) {
-                            d3.select('#rawlogs')
+                            d3.select('#requests')
                                 .append(`p`)
                                 .text("Too many rows, try filtering the dataset.");
                         } else {
-                            const table = d3.select('#rawlogs')
+                            const table = d3.select('#requests')
                                 .append('table');
 
                             const thead = table.append('thead');

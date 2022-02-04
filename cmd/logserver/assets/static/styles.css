@@ -10,7 +10,7 @@ table {
 td {
     vertical-align: top;
 }
-#rawlogs table {
+#requests table {
     max-width: 100%;
 }
 svg text {
