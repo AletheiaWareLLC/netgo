@@ -329,14 +329,27 @@ func Serve(name string) error {
 }
 
 func requestFiltersFromQuery(query url.Values) (result string) {
-	var headerfilters []string
+	var (
+		filter        string
+		headerfilters []string
+	)
 	hkey := netgo.QueryParameter(query, "header-key")
 	if hkey != "" {
-		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.key = '%s'`, hkey))
+		if strings.HasPrefix(hkey, "-") {
+			filter = fmt.Sprintf(`tbl_headers.key != '%s'`, hkey[1:])
+		} else {
+			filter = fmt.Sprintf(`tbl_headers.key = '%s'`, hkey)
+		}
+		headerfilters = append(headerfilters, filter)
 	}
 	hvalue := netgo.QueryParameter(query, "header-value")
 	if hvalue != "" {
-		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.value = '%s'`, hvalue))
+		if strings.HasPrefix(hvalue, "-") {
+			filter = fmt.Sprintf(`tbl_headers.value != '%s'`, hvalue[1:])
+		} else {
+			filter = fmt.Sprintf(`tbl_headers.value = '%s'`, hvalue)
+		}
+		headerfilters = append(headerfilters, filter)
 	}
 	if len(headerfilters) > 0 {
 		result += ` INNER JOIN tbl_headers ON tbl_requests.id = tbl_headers.request AND ` + strings.Join(headerfilters, ` AND `)
@@ -345,27 +358,47 @@ func requestFiltersFromQuery(query url.Values) (result string) {
 	var requestfilters []string
 	start := netgo.ParseInt(netgo.QueryParameter(query, "start"))
 	if start != 0 {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp > %d`, start))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp >= %d`, start))
 	}
 	end := netgo.ParseInt(netgo.QueryParameter(query, "end"))
 	if end != 0 {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp < %d`, end))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp <= %d`, end))
 	}
 	address := netgo.QueryParameter(query, "address")
 	if address != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.address = '%s'`, address))
+		if strings.HasPrefix(address, "-") {
+			filter = fmt.Sprintf(`tbl_requests.address != '%s'`, address[1:])
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.address = '%s'`, address)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	protocol := netgo.QueryParameter(query, "protocol")
 	if protocol != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.protocol = '%s'`, protocol))
+		if strings.HasPrefix(protocol, "-") {
+			filter = fmt.Sprintf(`tbl_requests.protocol != '%s'`, protocol[1:])
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.protocol = '%s'`, protocol)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	method := netgo.QueryParameter(query, "method")
 	if method != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.method = '%s'`, method))
+		if strings.HasPrefix(method, "-") {
+			filter = fmt.Sprintf(`tbl_requests.method != '%s'`, method[1:])
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.method = '%s'`, method)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	url := netgo.QueryParameter(query, "url")
 	if url != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.url = '%s'`, url))
+		if strings.HasPrefix(url, "-") {
+			filter = fmt.Sprintf(`tbl_requests.url != '%s'`, url[1:])
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.url = '%s'`, url)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	if len(requestfilters) > 0 {
 		result += ` WHERE ` + strings.Join(requestfilters, ` AND `)
@@ -374,30 +407,53 @@ func requestFiltersFromQuery(query url.Values) (result string) {
 }
 
 func headerFiltersFromQuery(query url.Values) (result string) {
-	var requestfilters []string
+	var (
+		filter         string
+		requestfilters []string
+	)
 	start := netgo.ParseInt(netgo.QueryParameter(query, "start"))
 	if start != 0 {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp > %d`, start))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp >= %d`, start))
 	}
 	end := netgo.ParseInt(netgo.QueryParameter(query, "end"))
 	if end != 0 {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp < %d`, end))
+		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.timestamp <= %d`, end))
 	}
 	address := netgo.QueryParameter(query, "address")
 	if address != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.address = '%s'`, address))
+		if strings.HasPrefix(address, "-") {
+			filter = fmt.Sprintf(`tbl_requests.address != '%s'`, address)
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.address = '%s'`, address)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	protocol := netgo.QueryParameter(query, "protocol")
 	if protocol != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.protocol = '%s'`, protocol))
+		if strings.HasPrefix(protocol, "-") {
+			filter = fmt.Sprintf(`tbl_requests.protocol != '%s'`, protocol)
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.protocol = '%s'`, protocol)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	method := netgo.QueryParameter(query, "method")
 	if method != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.method = '%s'`, method))
+		if strings.HasPrefix(method, "-") {
+			filter = fmt.Sprintf(`tbl_requests.method != '%s'`, method)
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.method = '%s'`, method)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	url := netgo.QueryParameter(query, "url")
 	if url != "" {
-		requestfilters = append(requestfilters, fmt.Sprintf(`tbl_requests.url = '%s'`, url))
+		if strings.HasPrefix(url, "-") {
+			filter = fmt.Sprintf(`tbl_requests.url != '%s'`, url)
+		} else {
+			filter = fmt.Sprintf(`tbl_requests.url = '%s'`, url)
+		}
+		requestfilters = append(requestfilters, filter)
 	}
 	if len(requestfilters) > 0 {
 		result += ` INNER JOIN tbl_requests ON tbl_requests.id = tbl_headers.request AND ` + strings.Join(requestfilters, ` AND `)
@@ -406,11 +462,21 @@ func headerFiltersFromQuery(query url.Values) (result string) {
 	var headerfilters []string
 	hkey := netgo.QueryParameter(query, "header-key")
 	if hkey != "" {
-		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.key = '%s'`, hkey))
+		if strings.HasPrefix(hkey, "-") {
+			filter = fmt.Sprintf(`tbl_headers.key != '%s'`, hkey)
+		} else {
+			filter = fmt.Sprintf(`tbl_headers.key = '%s'`, hkey)
+		}
+		headerfilters = append(headerfilters, filter)
 	}
 	hvalue := netgo.QueryParameter(query, "header-value")
 	if hvalue != "" {
-		headerfilters = append(headerfilters, fmt.Sprintf(`tbl_headers.value = '%s'`, hvalue))
+		if strings.HasPrefix(hvalue, "-") {
+			filter = fmt.Sprintf(`tbl_headers.value != '%s'`, hvalue)
+		} else {
+			filter = fmt.Sprintf(`tbl_headers.value = '%s'`, hvalue)
+		}
+		headerfilters = append(headerfilters, filter)
 	}
 	if len(headerfilters) > 0 {
 		result += ` WHERE ` + strings.Join(headerfilters, ` AND `)
