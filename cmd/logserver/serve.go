@@ -38,6 +38,7 @@ import (
 var embeddedFS embed.FS
 
 func Serve(name string) error {
+	// Configure Logging
 	logFile, err := netgo.SetupLogging()
 	if err != nil {
 		return err

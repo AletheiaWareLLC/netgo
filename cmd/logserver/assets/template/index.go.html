@@ -12,7 +12,7 @@
     <body>
         <h1>Hello Logs!</h1>
 
-        <a href="javascript:ClearFilters();">Clear Filters</a>
+        <a href="javascript:ClearAllFilters();">Clear All Filters</a>
 
         <h2>TIMELINE</h2>
 
@@ -85,7 +85,7 @@
             const headerkeyinput = document.getElementById('header-key-input');
             const headervalueinput = document.getElementById('header-value-input');
 
-            function ClearFilters() {
+            function ClearAllFilters() {
                 LoadData(new Map());
             }
 

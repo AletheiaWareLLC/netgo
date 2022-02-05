@@ -47,6 +47,7 @@ func main() {
 }
 
 func start() error {
+	// Configure Logging
 	logFile, err := netgo.SetupLogging()
 	if err != nil {
 		return err

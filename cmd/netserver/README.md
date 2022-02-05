@@ -116,8 +116,8 @@ sudo certbot certonly --standalone -d example.com
 # Allow netserver to read security credentials
 sudo chown -R netserver:netserver /etc/letsencrypt/
 
-# Add cron job to renew certificate on the first day of the week
-(sudo crontab -l ; echo '* * * * 0 sudo certbot renew --pre-hook "systemctl stop netserver" --post-hook "chown -R netserver:netserver /etc/letsencrypt/ && systemctl start netserver"') | sudo crontab -
+# Add cron job to automatically renew certificate
+(sudo crontab -l ; echo '1 1 * * 1 sudo certbot renew --pre-hook "systemctl stop netserver" --post-hook "chown -R netserver:netserver /etc/letsencrypt/ && systemctl start netserver"') | sudo crontab -
 ```
 
 ## Firewall
