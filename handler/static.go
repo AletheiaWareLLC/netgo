@@ -15,7 +15,7 @@ func AttachStaticFSHandler(m *http.ServeMux, fs fs.FS, listable bool, cache stri
 }
 
 func AttachStaticHTTPFSHandler(m *http.ServeMux, fs http.FileSystem, listable bool, cache string) {
-	m.Handle("/static/", Log(CacheControl(http.StripPrefix("/static/", StaticFS(fs, listable)), cache)))
+	m.Handle("/static/", Log(Compress(CacheControl(http.StripPrefix("/static/", StaticFS(fs, listable)), cache))))
 }
 
 func StaticDir(directory string, listable bool) http.Handler {
