@@ -2,7 +2,10 @@ a.danger {
     color: red;
 }
 body {
-    background-color: white;
+    background-color: #f8f8f8;
+}
+h1, h2, h3, h4, h5, h6 {
+    text-align: center;
 }
 table {
     width: 100%;
@@ -16,30 +19,44 @@ td {
 svg text {
     font-size: 14px;
 }
+.center {
+    text-align: center;
+}
 .tab {
-    overflow: hidden;
     background-color: #f1f1f1;
     border: none;
+    border-radius: 8px;
+    margin: 16px 0;
+    text-align: center;
 }
-.tab button {
+.tabbar {
+    display: inline-block;
+    margin: 0 auto;
+}
+.tabbar button {
     background-color: inherit;
-    float: left;
     border: none;
-    outline: none;
+    border-radius: 8px;
     cursor: pointer;
+    outline: none;
+    padding: 8px;
 }
-.tab button:hover {
+.tabbar button:hover {
     background-color: #ddd;
 }
-.tab button.active {
+.tabbar button.active {
     background-color: #ccc;
 }
 .tabcontent {
     display: none;
     border: none;
 }
+#start-input, #end-input, #address-input, #protocol-input, #method-input, #url-input, #header-key-input, #header-value-input {
+    font-family: monospace;
+    padding: 4px;
+}
 #address-input, #protocol-input, #method-input, #url-input, #header-key-input, #header-value-input {
-    width: calc(100% - 8px);
+    width: calc(100% - 12px);
 }
 /*
 Color Palette from Practical Rules for Using Color in Charts by Stephen Few
@@ -53,28 +70,28 @@ https://nbisweden.github.io/Rcourse/files/rules_for_using_color.pdf
 #a21e82 rgb(162, 30, 130)
 */
 #timeline rect {
-    fill: rgba(231, 20, 37, 0.5);
-}
-#timeline text {
-    fill: rgb(231, 20, 37);
-}
-#addresses rect {
-    fill: rgba(16, 124, 56, 0.5);
-}
-#addresses text {
-    fill: rgb(16, 124, 56);
-}
-#protocols rect {
     fill: rgba(20, 69, 153, 0.5);
 }
-#protocols text {
+#timeline text {
     fill: rgb(20, 69, 153);
 }
-#methods rect {
+#addresses rect {
+    fill: rgba(231, 20, 37, 0.5);
+}
+#addresses text {
+    fill: rgb(231, 20, 37);
+}
+#protocols rect {
     fill: rgba(235, 102, 27, 0.5);
 }
-#methods text {
+#protocols text {
     fill: rgb(235, 102, 27);
+}
+#methods rect {
+    fill: rgba(16, 124, 56, 0.5);
+}
+#methods text {
+    fill: rgb(16, 124, 56);
 }
 #urls rect {
     fill: rgba(61, 19, 91, 0.5);
@@ -99,8 +116,7 @@ https://nbisweden.github.io/Rcourse/files/rules_for_using_color.pdf
     padding: 4px;
     background-color: white;
     color: black;
-    border: 1px solid black;
-    border-radius: 4px;
+    border-radius: 2px;
     pointer-events: none;
 }
 #tooltip th {

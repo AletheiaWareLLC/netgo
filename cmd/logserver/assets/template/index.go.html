@@ -6,39 +6,43 @@
         <link rel="stylesheet" href="/static/styles.css"/>
         <script src="/static/d3.v7.min.js"></script>
         <script src="/static/charts.js"></script>
-        <title>Convey Logs - Aletheia Ware</title>
+        <title>Logs - Aletheia Ware</title>
     </head>
 
     <body>
         <h1>Hello Logs!</h1>
 
-        <a href="javascript:ClearAllFilters();">Clear All Filters</a>
+        <h2>Timeline</h2>
 
-        <h2>TIMELINE</h2>
-
-        <div style="width: 100%; text-align: center;">
-            <input type="text" id="start-input" onkeydown="Update()" /> - <input type="text" id="end-input" onkeydown="Update()" />
+        <div class="center">
+            <input type="text" id="start-input" onkeydown="Update()" size="24" /> - <input type="text" id="end-input" onkeydown="Update()" size="24" />
         </div>
 
         <!-- TODO add widget to control start/end time filter more easily -->
 
         <svg id="timeline" />
 
+        <div class="center">
+            <a href="javascript:ClearAllFilters();">Clear All Filters</a>
+        </div>
+
         <div class="tab">
-            <button class="tablinks" onclick="OpenView(event, 'aggregations')" id="defaultOpen"><h2>Aggregations</h2></button>
-            <button class="tablinks" onclick="OpenView(event, 'requests')"><h2>Requests</h2></button>
-            <button class="tablinks" onclick="OpenView(event, 'sessions')"><h2>Sessions</h2></button>
+            <div class="tabbar">
+                <button class="tablinks" onclick="OpenView(event, 'aggregations')" id="defaultOpen"><strong>Aggregations</strong></button>
+                <button class="tablinks" onclick="OpenView(event, 'requests')"><strong>Requests</strong></button>
+                <button class="tablinks" onclick="OpenView(event, 'sessions')"><strong>Sessions</strong></button>
+            </div>
         </div>
 
         <div id="aggregations" class="tabcontent">
             <table>
                 <tr>
-                    <th>ADDRESS</th>
-                    <th>PROTOCOL</th>
-                    <th>METHOD</th>
+                    <th>Address</th>
+                    <th>Protocol</th>
+                    <th>Method</th>
                     <th>URL</th>
-                    <th>HEADER KEY</th>
-                    <th>HEADER VALUE</th>
+                    <th>Header Key</th>
+                    <th>Header Value</th>
                 </tr>
                 <tr>
                     <td><input type="text" id="address-input" onkeydown="Update()" /></td>
@@ -59,7 +63,10 @@
             </table>
         </div>
 
+        <div id="requests" class="tabcontent"></div>
+
         <div id="sessions" class="tabcontent">
+            <p>Not Yet Implemented</p>
             <!--
                 TODO add session flow search box to enter a query.
                 eg. "/,/static,/digest,/best,/recent,/conversation,/content,/about,/subscribe-digest,/sign-up,/sign-up-verification,/sign-in,/account,/account-password,/account-recovery,/account-deactivate,/notification,/coin-buy,/publish,/reply,/gift,/delete,/stripe,/sign-out"
@@ -70,8 +77,6 @@
             -->
             <svg id="sessions" />
         </div>
-
-        <div id="requests" class="tabcontent"></div>
 
         <div id="tooltip" />
 
